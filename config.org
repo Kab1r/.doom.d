@@ -36,7 +36,7 @@ git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
 ** Font
 Default font is =VictorMono=, however this can be adjusted here as needed.
 #+begin_src emacs-lisp :exports code
-(setq doom-font (font-spec :family "VictorMono Nerd Font" ;; "Iosevka"
+(setq doom-font (font-spec :family "VictorMono NF" ;; "Iosevka"
                            :size 16))
 #+end_src
 ** Dracula Theme
@@ -69,10 +69,25 @@ Additional code snippets from [[https://github.com/AndreaCrotti/yasnippet-snippe
 #+begin_src emacs-lisp :tangle packages.el :exports code
 (package! yasnippet-snippets)
 #+end_src
+** Copilot
+#+begin_src emacs-lisp :exports code
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (("C-TAB" . 'copilot-accept-completion-by-word)
+         ("C-<tab>" . 'copilot-accept-completion-by-word)
+         :map copilot-completion-map
+         ("<tab>" . 'copilot-accept-completion)
+         ("TAB" . 'copilot-accept-completion)))
+(setq copilot-node-executable "~/.local/share/nvm/v17.9.1/bin/node")
+#+end_src
+#+begin_src emacs-lisp :tangle packages.el :exports code
+(package! copilot
+  :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+#+end_src
 ** Transparency
 #+begin_src emacs-lisp :exports code
- (set-frame-parameter (selected-frame) 'alpha '(92 . 90))
- (add-to-list 'default-frame-alist '(alpha . (92 . 90)))
+ ; (set-frame-parameter (selected-frame) 'alpha '(92 . 90))
+ ; (add-to-list 'default-frame-alist '(alpha . (92 . 90)))
 #+end_src
 
 * Language Specific
@@ -94,7 +109,20 @@ change `org-directory'. It must be set before org loads!
 *** LaTeX Packages
 #+begin_src emacs-lisp :exports code
 (after! org
-  (add-to-list 'org-latex-default-packages-alist '("margin=0.75in" "geometry")))
+  (add-to-list 'org-latex-default-packages-alist '("margin=1in" "geometry")))
+#+end_src
+*** Async Babel
+#+begin_src emacs-lisp :tangle packages.el :exports code
+(package! ob-async)
+#+end_src
+#+begin_src emacs-lisp :exports code
+(require 'ob-async)
+(setq ob-async-no-async-language-alist '("rustic" "rust"))
+#+end_src
+*** Roam
+#+begin_src emacs-lisp :exports code
+(make-directory "~/Documents/org/roam")
+(setq org-roam-directory (file-truename "~/Documents/org/roam"))
 #+end_src
 *** Roam-UI
 #+begin_src emacs-lisp :tangle packages.el :exports code
@@ -115,6 +143,28 @@ change `org-directory'. It must be set before org loads!
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
+#+end_src
+*** D2
+#+begin_src emacs-lisp :tangle packages.el :exports code
+(package! d2-mode)
+(package! ob-d2
+  :recipe (:host github :repo "dmacvicar/ob-d2"))
+#+end_src
+#+begin_src emacs-lisp
+(setq d2-tmp-dir "/tmp/d2")
+(org-babel-do-load-languages
+    'org-babel-load-languages
+    '((d2 . t)))
+#+end_src
+*** Protobuf
+#+begin_src emacs-lisp :tangle packages.el :exports code
+(package! protobuf-mode)
+#+end_src
+
+*** Julia (vterm)
+#+begin_src emacs-lisp :tangle packages.el :exports code
+(package! julia-vterm)
+(package! ob-julia-vterm)
 #+end_src
 ** [[https://deno.land][Deno(.land)]]
 *** Code Formatting
@@ -151,4 +201,33 @@ Major mode for [[https://mermaidjs.github.io/][mermaid]] and minor mode for org-
 Set path to mermaid CLI for minor mode.
 #+begin_src emacs-lisp :exports code
 ;; (setq ob-mermaid-cli-path (locate-file "mmdc" exec-path))
+#+end_src
+** WGSL
+#+begin_src emacs-lisp :exports code :tangle packages.el
+(package! wgsl-mode
+  :recipe (:host github :repo "acowley/wgsl-mode"))
+#+end_src
+** Yuck (eww Widgets)
+#+begin_src emacs-lisp :exports code :tangle packages.el
+(package! yuck-mode
+  :recipe (:host github :repo "mmcjimsey26/yuck-mode" :files ("yuck-mode.el")))
+#+end_src
+** Elsa Lambda Calculus Evaluator
+#+begin_src emacs-lisp :exports code :tangle packages.el
+(package! elsa-lambda-calculus-mode
+  :recipe (:host github :repo "Kab1r/elsa-lambda-calculus-mode" :files ("elsa-lambda-calculus-mode.el")))
+#+end_src
+** TLA+
+#+begin_src emacs-lisp :exports code :tangle packages.el
+(package! tla-mode)
+#+end_src
+** Package Lint
+#+begin_src emacs-lisp :tangle packages.el :exports code
+(package! package-lint)
+#+end_src
+** Language Tool
+#+begin_src emacs-lisp :exports code
+(setq langtool-http-server-host "lt.kabr.dev"
+      langtool-http-server-port 443
+      langtool-http-server-stream-type 'tls)
 #+end_src
